@@ -1,2 +1,7 @@
 node_modules
 .env
+
+dump.rdb
+error.log
+combined.log
+erl_crash.dump
