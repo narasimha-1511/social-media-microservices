@@ -22,7 +22,7 @@ services:
     networks:
       - backend
 
-  db:
+  users-db:
     image: mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=user
@@ -32,19 +32,52 @@ services:
       - 27017:27017
     networks:
       - backend
+  
+  posts-db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_DATABASE=db
+    ports:
+      - 27018:27017
+    networks:
+      - backend
+
+  media-db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_DATABASE=db
+    ports:
+      - 27019:27017
+    networks:
+      - backend
+
+  search-db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_DATABASE=db
+    ports:
+      - 27020:27017
+    networks:
+      - backend
 
   user-service:
     build: ./user-service
     ports:
       - "3001:3001"
     depends_on:
-      - db
+      - users-db
       - redis
     environment:
       - PORT=3001
       - NODE_ENV=prod
       - JWT_SECRET=secret
-      - MONGODB_URI=mongodb://user:pass@db:27017/db?authSource=admin
+      - MONGODB_URI=mongodb://user:pass@users-db:27017/db?authSource=admin
       - REDIS_URL=redis://redis:6379
     networks:
       - backend
@@ -55,12 +88,12 @@ services:
       - "3002:3002"
     depends_on:
       - rabbitmq
-      - db
+      - posts-db
       - redis
     environment:
       - PORT=3002
       - NODE_ENV=prod
-      - MONGODB_URI=mongodb://user:pass@db:27017/db?authSource=admin
+      - MONGODB_URI=mongodb://user:pass@posts-db:27017/db?authSource=admin
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
     networks:
@@ -71,7 +104,7 @@ services:
       - "3003:3003"
     depends_on:
       - rabbitmq
-      - db
+      - media-db
       - redis
     environment:
       - PORT=3003
@@ -80,7 +113,7 @@ services:
       - CLOUDINARY_API_KEY=<use_yours>
       - CLOUDINARY_API_SECRET=<use_yours>
       - CLOUDINARY_URL=<use_yours>
-      - MONGODB_URI=mongodb://user:pass@db:27017/db?authSource=admin
+      - MONGODB_URI=mongodb://user:pass@media-db:27017/db?authSource=admin
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
     networks:
@@ -91,14 +124,14 @@ services:
       - "3004:3004"
     depends_on:
       - rabbitmq
-      - db
+      - search-db
       - redis
     environment:
       - NODE_ENV=prod
       - PORT=3004
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
-      - MONGODB_URI=mongodb://user:pass@db:27017/db?authSource=admin
+      - MONGODB_URI=mongodb://user:pass@search-db:27017/db?authSource=admin
     networks:
       - backend
   api-gateway:

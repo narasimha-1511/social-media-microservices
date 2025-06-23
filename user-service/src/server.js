@@ -22,7 +22,7 @@ app.use(cors())
 app.use(express.json())
 app.use((req , _res , next) => {
     logger.info(`Received ${req.method} request to ${req.url}`)
-    logger.info(`Received body , ${req.body}`)
+    logger.info(`Received body `, {body: req.body})
     next()
 })
 //DDOS PROTECT

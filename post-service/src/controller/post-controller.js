@@ -4,6 +4,7 @@ const { createPostValidation } = require("../utils/validation");
 const { publishEvent } = require("../utils/rabbitmq")
 
 async function invalidatePostCache(req , postId){
+    logger.info(`cache invalidated`)
     let keys = await req.redisClient.keys("posts:*");
     keys.push(`post:${postId}`);
     if(keys && keys.length > 0){
@@ -79,6 +80,7 @@ const getAllPosts = async (req , res) => {
         const cachedPosts = await req.redisClient.get(cacheKey);
 
         if(cachedPosts){
+            logger.info(`hit cache for getAllposts`)
            return res.json(JSON.parse(cachedPosts));
         }
 
