@@ -10,7 +10,7 @@ COPY wait-for-it.sh /wait-for-it.sh
 
 RUN chmod +x /wait-for-it.sh
 
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash netcat-openbsd
 
 RUN npm ci --only=production
 
